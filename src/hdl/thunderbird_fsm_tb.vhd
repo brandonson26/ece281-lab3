@@ -107,6 +107,49 @@ begin
 	sim_proc : process
 	begin
 	
+	--reset
+	w_reset <= '1';
+	wait for k_clk_period*1;
+	   assert w_lights_L = "000" report "bad reset left" severity failure;
+	   assert w_lights_R = "000" report "bad reset right" severity failure;
+	
+    w_reset <= '0';
+    wait for k_clk_period*1;
+	
+	--OFF
+	w_left <= '0'; wait for k_clk_period;
+	   assert w_lights_L = "000" report "left lights should be turned off if no input" severity failure;
+	w_right <= '0'; wait for k_clk_period;
+	   assert w_lights_R = "000" report "right lights should be turned off if no input" severity failure;
+	   
+    --Left Input
+	w_left <= '1'; wait for k_clk_period;
+       assert w_lights_L(0) = "101" report "LA if left input" severity failure;
+       wait for k_clk_period; --time to go to LB
+           assert w_lights_L(1) = "101" report "LA did not go to LB" severity failure;
+       
+       assert w_lights_L(1) = "110" report "LB from LA" severity failure;
+       wait for k_clk_period; --time to go to Lc
+           assert w_lights_L(2) = "110" report "LB did not go to LC" severity failure;
+       
+       assert w_lights_L(2) = "111" report "LC from LB" severity failure;
+           assert w_lights_L(0) = "111" report "OFF from LC" severity failure;
+       
+   --Right Input
+    w_right <= '1'; wait for k_clk_period;
+       assert w_lights_R(0) = "010" report "RA if left input" severity failure;
+       wait for k_clk_period; -- time to go to RB
+           assert w_lights_R(1) = "010" report "RA did not go to RB" severity failure;
+       
+       assert w_lights_R(1) = "011" report "RA RB if left input" severity failure;
+       wait for k_clk_period; -- time to go to RC
+           assert w_lights_R(2) = "011" report "RB did not go to RC" severity failure;
+       
+       assert w_lights_R(2) = "100" report "RA RB RC left input" severity failure;
+	   wait for k_clk_period; -- time to reset
+	       assert w_lights_R(0) = "100" report "RC did not go to OFF" severity failure;
+	       
+	
 	
 	wait;
 	end process;
