@@ -11,8 +11,8 @@
 --| ---------------------------------------------------------------------------
 --|
 --| FILENAME      : thunderbird_fsm.vhd
---| AUTHOR(S)     : Capt Phillip Warner, Capt Dan Johnson
---| CREATED       : 03/2017 Last modified 06/25/2020
+--| AUTHOR(S)     : Brandon Son
+--| CREATED       : 03/20/2024
 --| DESCRIPTION   : This file implements the ECE 281 Lab 2 Thunderbird tail lights
 --|					FSM using enumerated types.  This was used to create the
 --|					erroneous sim for GR1
@@ -36,19 +36,20 @@
 --|					can be changed by the inputs
 --|					
 --|
---|                 xxx State Encoding key
---|                 --------------------
---|                  State | Encoding
---|                 --------------------
---|                  OFF   | 
---|                  ON    | 
---|                  R1    | 
---|                  R2    | 
---|                  R3    | 
---|                  L1    | 
---|                  L2    | 
---|                  L3    | 
---|                 --------------------
+--| -----------------------
+--| One-Hot State Encoding key
+--| --------------------
+--| State | Encoding
+--| --------------------
+--| OFF   | 10000000
+--| ON    | 01000000
+--| R1    | 00100000
+--| R2    | 00010000
+--| R3    | 00001000
+--| L1    | 00000100
+--| L2    | 00000010
+--| L3    | 00000001
+--| --------------------
 --|
 --|
 --+----------------------------------------------------------------------------
@@ -86,23 +87,58 @@ library ieee;
   use ieee.numeric_std.all;
  
 entity thunderbird_fsm is 
-  port(
-	
+    port(
+        i_clk, i_reset : in std_logic;
+        i_left, i_right : in std_logic;
+        o_lights_L : out std_logic_vector(2 downto 0);
+        o_lights_R : out std_logic_vector(2 downto 0)
   );
 end thunderbird_fsm;
 
 architecture thunderbird_fsm_arch of thunderbird_fsm is 
 
 -- CONSTANTS ------------------------------------------------------------------
-  
+    signal f_Q : std_logic_vector(7 downto 0) := "10000000";
+    signal f_Q_next : std_logic_vector(7 downto 0) := "10000000";
+    
 begin
 
-	-- CONCURRENT STATEMENTS --------------------------------------------------------	
+	-- CONCURRENT STATEMENTS --------------------------------------------------------
+	-- Next State Logic
+	f_Q_next(7) <= f_Q(7) and (not i_left) and (not i_right);
+	f_Q_next(7) <= f_Q(5);
+	f_Q_next(7) <= f_Q(3);
+	f_Q_next(7) <= f_Q(1);
+	f_Q_next(6) <= f_Q(7) and i_left and i_right;
+	f_Q_next(5) <= f_Q(1) and (not i_left) and i_right;
+	f_Q_next(4) <= f_Q(5);
+	f_Q_next(3) <= f_Q(4);
+	f_Q_next(2) <= f_Q(1) and i_left and (not i_right);
+	f_Q_next(1) <= f_Q(2);
+	f_Q_next(0) <= f_Q(1);
 	
+	
+	-- Output Logic
+	o_lights_L(0) <= f_Q(6) and f_Q(2) and f_Q(1) and f_Q(0);
+	o_lights_L(1) <= f_Q(6) and f_Q(1) and f_Q(0);
+	o_lights_L(2) <= f_Q(6) and f_Q(0);
+	o_lights_R(0) <= f_Q(6) and f_Q(5) and f_Q(4) and f_Q(3);
+	o_lights_R(1) <= f_Q(6) and f_Q(4) and f_Q(3);
+	o_lights_R(2) <= f_Q(6) and f_Q(3);
+		
     ---------------------------------------------------------------------------------
 	
 	-- PROCESSES --------------------------------------------------------------------
+    -- state memory w/ asynchronous reset ---------------
+    register_proc : process (i_clk, i_reset)
+    begin
+        if i_reset = '1' then
+            f_Q <= "10000000";    --Reset state is OFF
+        elsif (rising_edge(i_clk)) then
+            f_Q <= f_Q_next;    --next state becomes current state
+        end if;
     
+        end process register_proc;
 	-----------------------------------------------------					   
 				  
 end thunderbird_fsm_arch;

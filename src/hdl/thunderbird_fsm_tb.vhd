@@ -11,8 +11,8 @@
 --| ---------------------------------------------------------------------------
 --|
 --| FILENAME      : thunderbird_fsm_tb.vhd (TEST BENCH)
---| AUTHOR(S)     : Capt Phillip Warner
---| CREATED       : 03/2017
+--| AUTHOR(S)     : Brandon Son
+--| CREATED       : 03/20/2024
 --| DESCRIPTION   : This file tests the thunderbird_fsm modules.
 --|
 --|
@@ -58,14 +58,26 @@ architecture test_bench of thunderbird_fsm_tb is
 	
 	component thunderbird_fsm is 
 	  port(
-		
+        i_clk, i_reset : in std_logic;
+        i_left, i_right : in std_logic;
+        o_lights_L : out std_logic_vector(2 downto 0);
+        o_lights_R : out std_logic_vector(2 downto 0)
 	  );
 	end component thunderbird_fsm;
 
 	-- test I/O signals
+	--Inputs
+	signal w_clk : std_logic := '0';
+	signal i_reset : std_logic := '0';
+	signal i_left : std_logic := '0';
+	signal i_right : std_logic := '0';
+	
+	--Ouputs
+	signal o_lights_L : std_logic_vector(2 downto 0) := "000";
+	signal o_lights_R : std_logic_vector(2 downto 0) := "000";
 	
 	-- constants
-	
+	constant k_clk_period : time := 10 ns;
 	
 begin
 	-- PORT MAPS ----------------------------------------

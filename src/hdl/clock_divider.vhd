@@ -11,8 +11,8 @@
 --| ---------------------------------------------------------------------------
 --|
 --| FILENAME      : clock_divider.vhd
---| AUTHOR(S)     : Capt Phillip Warner
---| CREATED       : 03/2017
+--| AUTHOR(S)     : Brandon Son
+--| CREATED       : 03/20/2024
 --| DESCRIPTION   : This file implements a generic clock divider that uses a counter and comparator.
 --|					This provides more flexibility than simpler designs that use a bit from a 
 --|					clk bus (they only provide divisors of powers of 2).
@@ -45,6 +45,7 @@
 --|    sm_<state machine type>  = state machine type definition
 --|    s_<signal name>          = state name
 --|
+
 --+----------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
