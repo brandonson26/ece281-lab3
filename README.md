@@ -26,3 +26,6 @@ env:
 
 If successful then GHDL will quietly exit with a `0` code.
 If any of the `assert` statements fail **with** `severity error` then GHDL will cease the simulation and exit with non-zero code; this will also cause the workflow to fail.
+
+## Documentation Statement
+I went into EI to clarify my output and logic states with Major Seery. I also went into EI to verify my waveform and top level design with Major Seery.
